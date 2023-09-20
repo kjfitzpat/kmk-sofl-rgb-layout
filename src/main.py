@@ -5,9 +5,10 @@ from kb import KMKKeyboard
 from kmk.keys import KC
 from kmk.modules.encoder import EncoderHandler
 from kmk.modules.layers import Layers
-from kmk.modules.split import Split, SplitType
+from kmk.modules.split import Split, SplitSide, SplitType
 from kmk.modules.modtap import ModTap
 from kmk.extensions.media_keys import MediaKeys
+from kmk.extensions.RGB import RGB
 
 keyboard = KMKKeyboard()
 encoder_handler = EncoderHandler()
@@ -15,16 +16,9 @@ layers = Layers()
 modtap = ModTap()
 mediakeys = MediaKeys()
 
-split = Split(
-    split_flip=True,  # If both halves are the same, but flipped, set this True
-    split_type=SplitType.UART,  # Defaults to UART
-    uart_interval=20,  # Sets the uarts delay. Lower numbers draw more power
-    data_pin=board.RX,  # The primary data pin to talk to the secondary device with
-    data_pin2=board.TX,  # Second uart pin to allow 2 way communication
-    use_pio=True,  # allows for UART to be used with PIO
-)
+split = Split(use_pio=True)
 
-encoder_handler.pins = ((keyboard.encoder_pin_1, keyboard.encoder_pin_0, None, False),)
+encoder_handler.pins = ((keyboard.encoder_b, keyboard.encoder_a, None, False))
 
 keyboard.modules = [layers, split, encoder_handler, modtap, mediakeys]
 
@@ -74,6 +68,12 @@ encoder_handler.map = (
     ((KC.VOLD, KC.VOLU),),  # Raise
     ((KC.VOLD, KC.VOLU),),  # Lower
 )
+
+# rgb
+rgb = RGB(keyboard.rgb_pixel_pin, num_pixels=36, hue_default=127, sat_default=255, val_default=255)
+keyboard.extensions.append(rgb)
+
+keyboard.debug_enabled = True
 
 if __name__ == '__main__':
     keyboard.go()
